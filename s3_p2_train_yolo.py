@@ -43,18 +43,20 @@ demo-bin-picking
 '''
 
 import os
+from yolo_train.train import train_yolo11
+
 if __name__ == '__main__':
 
     # Specify the path to the dataset folder.
     # 指定数据集文件夹的路径。
-    dataset_path = 'xxx/xxx/demo-bin-picking'
+    dataset_path = '/mnt/a23f9bec-57bd-461b-8d1d-06d98a9f961c/dzy/HCCEPose-main/demo-bin-picking'
     
     # Specify the number of GPUs and the number of training epochs.  
     # For example, use 8 GPUs to train for 100 epochs.
     # 指定 GPU 的数量以及训练轮数。  
     # 例如使用 8 张 GPU 进行 100 轮训练。
-    gpu_num = 8
-    epochs = 100
+    gpu_num = 1
+    epochs = 1000
     
     # Train
     # 开始训练
@@ -67,10 +69,14 @@ if __name__ == '__main__':
     model_name = f"yolo11-{task_suffix}-obj_s.pt"
     final_model_path = os.path.join(os.path.dirname(os.path.dirname(data_objs_path)), save_dir, model_name)
     obj_s_path = os.path.dirname(final_model_path)
-    batch_size = 12*gpu_num
-    while 1:
-        if not os.path.exists('%s'%obj_s_path):
-            os.system("python %s --data_path '%s' --epochs %s --imgsz 640 --batch %s --gpu_num %s --task %s"%(train_multi_path, data_objs_path, str(epochs), str(batch_size), str(gpu_num), task_suffix))
-        if os.path.exists('%s'%obj_s_path):
-            break
-    pass
+    batch_size = 8*gpu_num
+
+    train_yolo11(
+        task=task_suffix,
+        data_path=data_objs_path,
+        gpu_num = gpu_num,
+        # obj_id=args.obj_id,
+        epochs=epochs,
+        imgsz=640,
+        batch=batch_size
+    )
